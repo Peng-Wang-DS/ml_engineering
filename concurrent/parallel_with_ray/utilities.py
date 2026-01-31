@@ -7,7 +7,6 @@ from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
 import time
 import matplotlib.pyplot as plt
 
-
 class DataPreprocessor:
     def __init__(self):
         self.df: pd.DataFrame = None
