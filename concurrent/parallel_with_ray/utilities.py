@@ -276,53 +276,6 @@ def forecast_one_item_ray(category, data_dict, plot=False):
 
     result = pd.DataFrame(data=[test_preds, y_test], index=['test_preds', 'y_test'])
 
-    # Note: Plotting from Ray workers can be tricky, so disabled by default
-    # If you want plots, consider plotting after collecting results
-    if plot:
-        import matplotlib
-        matplotlib.use('Agg')  # Non-interactive backend for Ray workers
-        import matplotlib.pyplot as plt
-
-        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-
-        # Plot 1: Full history with train/test split
-        ax1 = axes[0]
-        train_indices = y_train.index
-        test_indices = y_test.index
-
-        ax1.plot(
-            train_indices,
-            y_train,
-            label='Train (Actual)',
-            color='blue',
-            alpha=0.7)
-        ax1.plot(test_indices, y_test, label='Test (Actual)', color='green', alpha=0.7)
-        ax1.plot(test_indices, test_preds, label='Test (Forecast)',
-                 color='red', linestyle='--', linewidth=2)
-        ax1.axvline(x=train_indices[-1], color='black', linestyle=':',
-                    label='Train/Test Split', linewidth=1.5)
-        ax1.set_title(f'{category} - Historical & Forecast')
-        ax1.set_xlabel('Index')
-        ax1.set_ylabel('Quantity')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-
-        # Plot 2: Test period only
-        ax2 = axes[1]
-        ax2.plot(test_indices, y_test, label='Actual',
-                 marker='o', color='green', linewidth=2)
-        ax2.plot(test_indices, test_preds, label='Forecast',
-                 marker='s', color='red', linestyle='--', linewidth=2)
-        ax2.set_title(f'{category} - Test Period Detail (MAE: {test_mae:.2f})')
-        ax2.set_xlabel('Index')
-        ax2.set_ylabel('Quantity')
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-
-        plt.tight_layout()
-        plt.savefig(f'/tmp/{category}_forecast.png', dpi=100, bbox_inches='tight')
-        plt.close()
-
     time.sleep(10)
     print(f'{category} mae is {test_mae:.2f}')
     return category, result, test_mae
