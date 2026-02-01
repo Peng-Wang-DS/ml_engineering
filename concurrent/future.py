@@ -3,7 +3,6 @@ from concurrent import futures
 from parallel_with_ray.ray_example2_main import dummy_forecast_all_item_normal, timer, ITEMS
 import math,random,time,os
 
-
 def dummy_forecast_one_item_concurrent(item, seed):
     """Forecast one item with heavy computation -> simulate ML tasks"""
     random.seed(seed)
@@ -18,45 +17,52 @@ def dummy_forecast_one_item_concurrent(item, seed):
 
 @timer
 def dummy_forecast_all_item_threadpool():
-    """Multithreading with ThreadPoolExecutor"""
-    print("=" * 60)
-    print('Multithreading with ThreadPoolExecutor')
-    print("=" * 60)
+    """Multiprocessing with ThreadPoolExecutor.
+    Returns a dict: {item: result}
+    """
+
+    results = {}
+
     with futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-        to_do: list[futures.Future] = []
+        future_to_item = {
+            executor.submit(
+                dummy_forecast_one_item_concurrent, item, 42 + idx
+            ): item
+            for idx, item in enumerate(ITEMS)
+        }
 
-        for idx, item in enumerate(ITEMS):
-            future = executor.submit(
-                dummy_forecast_one_item_concurrent,
-                item,
-                42 + idx,
-            )
-            to_do.append(future)
+        for count, future in enumerate(futures.as_completed(future_to_item), 1):
+            item = future_to_item[future]
+            res = future.result()
+            results[item] = res
+            # print(f"[{count}] Item={item!r}, result={res!r}")
 
-        for count, future in enumerate(futures.as_completed(to_do), 1):
-            res: str = future.result()
-            print(f"{future} result: {res!r}")
-
-    return count
+    return results
 
 # %% use concurrent future processpoolexecutor for multithreading
 @timer
 def dummy_forecast_all_item_processpool():
-    """Multiprocessing with ProcessPoolExecutor"""
-    print("=" * 60)
-    print('Multiprocessing with ProcessPoolExecutor')
-    print("=" * 60)
+    """Multiprocessing with ProcessPoolExecutor.
+    Returns a dict: {item: result}
+    """
+
+    results = {}
+
     with futures.ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
-        to_do = [
-            executor.submit(dummy_forecast_one_item_concurrent, item, 42 + idx)
+        future_to_item = {
+            executor.submit(
+                dummy_forecast_one_item_concurrent, item, 42 + idx
+            ): item
             for idx, item in enumerate(ITEMS)
-        ]
+        }
 
-        for count, future in enumerate(futures.as_completed(to_do), 1):
+        for count, future in enumerate(futures.as_completed(future_to_item), 1):
+            item = future_to_item[future]
             res = future.result()
-            print(f"{future} result: {res!r}")
+            results[item] = res
+            # print(f"[{count}] Item={item!r}, result={res!r}")
 
-    return count
+    return results
 
 
 if __name__ == '__main__':
@@ -69,7 +75,7 @@ if __name__ == '__main__':
     print("MultiThread PROCESSING")
     print("=" * 60)
     threadpool_re = dummy_forecast_all_item_threadpool()
-
+    
     print("=" * 60)
     print("MultiProcess PROCESSING")
     print("=" * 60)
