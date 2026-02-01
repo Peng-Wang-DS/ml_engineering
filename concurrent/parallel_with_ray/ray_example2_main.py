@@ -86,9 +86,7 @@ def dummy_forecast_all_item_ray():
     return ray.get(futures)
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("SEQUENTIAL PROCESSING")
-    print("=" * 60)
+
     dummy_forecast_all_item_normal()
     
     print("\n" + "=" * 60)

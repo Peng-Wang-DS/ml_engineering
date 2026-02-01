@@ -1,3 +1,4 @@
+from functools import wraps
 import ray
 import pandas as pd
 import numpy as np
@@ -293,3 +294,14 @@ def print_time(label: str, seconds: float, colour: str = "green"):
     r = colours["reset"]
 
     print(f"\n{c}{'=' * 10} {label}: {seconds:.2f} seconds {'=' * 10}{r}\n")
+
+
+def register_step(fn):
+    """Decorator to print formatted step headers before function execution."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        print("=" * 60)
+        print(f"Running {fn.__name__.upper()}")
+        print("=" * 60)
+        return fn(*args, **kwargs)
+    return wrapper

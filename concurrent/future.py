@@ -2,7 +2,7 @@ from concurrent import futures
 # %% use concurrent future threadpoolexecutor for multithreading
 from parallel_with_ray.ray_example2_main import dummy_forecast_all_item_normal, timer, ITEMS
 import math,random,time,os
-
+from parallel_with_ray.utilities import register_step
 def dummy_forecast_one_item_concurrent(item, seed):
     """Forecast one item with heavy computation -> simulate ML tasks"""
     random.seed(seed)
@@ -15,7 +15,9 @@ def dummy_forecast_one_item_concurrent(item, seed):
     time.sleep(2)
     return {'item': item, 'forecast': forecast, 'computation': computation}
 
+
 @timer
+@register_step
 def dummy_forecast_all_item_threadpool():
     """Multiprocessing with ThreadPoolExecutor.
     Returns a dict: {item: result}
@@ -40,7 +42,10 @@ def dummy_forecast_all_item_threadpool():
     return results
 
 # %% use concurrent future processpoolexecutor for multithreading
+
+
 @timer
+@register_step
 def dummy_forecast_all_item_processpool():
     """Multiprocessing with ProcessPoolExecutor.
     Returns a dict: {item: result}
@@ -66,17 +71,8 @@ def dummy_forecast_all_item_processpool():
 
 
 if __name__ == '__main__':
-    print("=" * 60)
-    print("SEQUENTIAL PROCESSING")
-    print("=" * 60)
-    results_seq = dummy_forecast_all_item_normal()
+    # results_seq = dummy_forecast_all_item_normal()
     
-    print("=" * 60)
-    print("MultiThread PROCESSING")
-    print("=" * 60)
     threadpool_re = dummy_forecast_all_item_threadpool()
     
-    print("=" * 60)
-    print("MultiProcess PROCESSING")
-    print("=" * 60)
     processpool_re = dummy_forecast_all_item_processpool()
