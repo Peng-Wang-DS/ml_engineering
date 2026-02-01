@@ -1,6 +1,6 @@
 from concurrent import futures
 # %% use concurrent future threadpoolexecutor for multithreading
-from parallel_with_ray.ray_example2_main import dummy_forecast_all_item_normal, timer, ITEMS
+from parallel_with_ray.ray_example2_main import dummy_forecast_all_item_normal, timer, ITEMS,init_ray,dummy_forecast_all_item_ray
 import math,random,time,os
 from parallel_with_ray.utilities import register_step
 def dummy_forecast_one_item_concurrent(item, seed):
@@ -71,8 +71,19 @@ def dummy_forecast_all_item_processpool():
 
 
 if __name__ == '__main__':
+    print("=" * 60)
+    print(f"Running {'dummy_forecast_all_item_normal'.upper()}")
+    print("=" * 60)
     results_seq = dummy_forecast_all_item_normal()
     
     threadpool_re = dummy_forecast_all_item_threadpool()
     
     processpool_re = dummy_forecast_all_item_processpool()
+    
+    init_ray()
+    import ray
+    print("=" * 60)
+    print(f"Running {'dummy_forecast_all_item_ray'.upper()}")
+    print("=" * 60)
+    dummy_forecast_all_item_ray()
+    ray.shutdown()
