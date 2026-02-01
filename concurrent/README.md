@@ -21,7 +21,7 @@ concurrent/
 │   ├── ray_example2_main.py              # Ray implementation: Simple function example
 │   └── utilities.py                      # Utility functions
 │
-├── future.py                             # Comparison: Sequential vs ThreadPool vs ProcessPool
+├── future_n_ray.py                             # Comparison: Sequential vs ThreadPool vs ProcessPool vs Ray
 ├── python_concurrency_diagram.pdf        # Comprehensive Python concurrency cheatsheet
 └── ThreadPoolExecutor_Batch.py           # Batch processing implementation
 ```
