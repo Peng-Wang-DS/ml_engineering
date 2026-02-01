@@ -71,7 +71,7 @@ def dummy_forecast_all_item_processpool():
 
 
 if __name__ == '__main__':
-    # results_seq = dummy_forecast_all_item_normal()
+    results_seq = dummy_forecast_all_item_normal()
     
     threadpool_re = dummy_forecast_all_item_threadpool()
     
