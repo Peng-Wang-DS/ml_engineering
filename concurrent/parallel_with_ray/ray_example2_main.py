@@ -4,6 +4,8 @@ import warnings
 # Suppress warnings BEFORE importing ray
 warnings.filterwarnings('ignore', category=FutureWarning)
 os.environ['RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO'] = '0'
+os.environ["RAY_DISABLE_METRICS"] = "1"
+os.environ["RAY_METRICS_EXPORT_PORT"] = ""
 
 import ray
 import time
@@ -11,6 +13,7 @@ import math
 import random
 
 def pretty_print(label: str, seconds: float, colour: str = "green"):
+    
     colours = {
         "green": "\033[92m",
         "blue": "\033[94m",
@@ -23,14 +26,14 @@ def pretty_print(label: str, seconds: float, colour: str = "green"):
     r = colours["reset"]
 
     print(f"\n{c}{'=' * 10} {label}: {seconds:.2f} seconds {'=' * 10}{r}\n")
-
-ray.init(
-    ignore_reinit_error=True,
-    logging_level='ERROR',
-    log_to_driver=False,
-    configure_logging=False,
-    include_dashboard=False
-)
+def init_ray():
+    ray.init(
+        ignore_reinit_error=True,
+        logging_level='ERROR',
+        log_to_driver=False,
+        configure_logging=False,
+        include_dashboard=False
+    )
 
 ITEMS = ['apple', 'orange', 'pear', 'cucumber', 'watermelon', 'mango', 'grape', 'tomato',
          'banana', 'strawberry', 'blueberry', 'pineapple', 'kiwi', 'peach', 'plum',
@@ -55,6 +58,7 @@ def dummy_forecast_one_item_ray(item, seed):
         for i in random.sample(range(1, 10_000_000), 500)
     ])
     forecast = random.sample(range(0, 100), 10)
+    time.sleep(2)
     return {'item': item, 'forecast': forecast, 'computation': computation}
 
 @timer
@@ -62,6 +66,7 @@ def dummy_forecast_all_item_normal():
     """Sequential/Normal processing"""
     results = []
     for idx, item in enumerate(ITEMS):
+        time.sleep(2)
         print(f'forecasting {item}...')
         random.seed(42 + idx)
         computation = sum([
@@ -80,15 +85,16 @@ def dummy_forecast_all_item_ray():
                for idx, item in enumerate(ITEMS)]
     return ray.get(futures)
 
-# Execute both versions
-print("=" * 60)
-print("SEQUENTIAL PROCESSING")
-print("=" * 60)
-results_seq = dummy_forecast_all_item_normal()
-
-print("\n" + "=" * 60)
-print("PARALLEL PROCESSING WITH RAY")
-print("=" * 60)
-results_par = dummy_forecast_all_item_ray()
-
-ray.shutdown()
+if __name__ == "__main__":
+    print("=" * 60)
+    print("SEQUENTIAL PROCESSING")
+    print("=" * 60)
+    dummy_forecast_all_item_normal()
+    
+    print("\n" + "=" * 60)
+    print("PARALLEL PROCESSING WITH RAY")
+    print("=" * 60)
+    init_ray()
+    dummy_forecast_all_item_ray()
+    
+    ray.shutdown()
