@@ -2,6 +2,9 @@
 
 A comprehensive exploration of Python's concurrency models, comparing sequential processing against multithreading, multiprocessing, and Ray distributed computing.
 
+### ⚡ Performance Key Takeaways
+**Ray (6s) > ProcessPool (8s) > ThreadPool (19s) > Sequential (57s)**
+
 ## Overview
 
 This repository demonstrates performance comparisons across different execution paradigms:
